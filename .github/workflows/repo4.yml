@@ -1,0 +1,37 @@
+name: Sync Repo4 to dev
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+          fetch-depth: 0
+          ref: dev
+
+      - name: Git config
+        run: |
+          git config --global user.name "jjjzzz666"
+          git config --global user.email "jjjzzz666@users.noreply.github.com"
+          git config --global lfs.allowincompletepush true
+
+      - name: Update repo4
+        run: |
+          rm -rf HarmonyOS_Samples-guide-snippets
+          git clone https://gitcode.com/HarmonyOS_Samples/guide-snippets.git --depth=1 temp
+          rm -rf temp/.git
+          find temp -size +10M -delete
+          find temp -type d -empty -delete
+          mv temp HarmonyOS_Samples-guide-snippets
+
+      - name: Push
+        run: |
+          git add .
+          git commit -m "update repo4" || true
+          git push origin dev --no-verify
